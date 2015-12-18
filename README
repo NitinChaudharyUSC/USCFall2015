@@ -1,0 +1,116 @@
+Name: Nitin Chaudhary
+
+				BRIEF OVERVIEW
+			------------------------------
+In this assignment a set of servers (4 in this project) exchange messages using
+TCP and UDP Protocols over the port numbers specified in the assignment. The cl-
+ient process on booting up creates a TCP server to recieve to TCP segment from
+the clients having the network topology as seen by each server indivitually.
+After recieving the messages from all the expected servers the client prepares a
+adjacency matrix to indicate a consistent view of the entire network and sends
+the same using UDP datagrams to the server. The client then proceeds ahead and
+generates Minimum Spanning Tree (MST) using Prim's Algorithm and prints the
+same on the console.
+
+The server processes on the otherhand on booting up first connect to the client
+server and pass on the information read from the server configuration files and
+prepares the TCP message in the format [Server_ID <Link1_name cost> <Link2_name
+cost> ...]. Each server process then proceeds further by initiating a UDP Server
+which will wait for recieving the complete network information from the client
+via datagram packets. Once a datagram arrives the server process parses the
+datagram packet it recieved and then procceeds by printing the same on console.
+
+During the coding of this assignment, the code has been made IP version indepen-
+dent using the structure sock_storage and API get_addr_info() which facilates the
+filing of the addrinfo structure for a given Hostname. The socket usage methodoloy
+follows the refrence book 'Beej's Guide To Network Programming' and code templates
+mentioned in the textbook were used as a refrence duing the assignment. The whole
+of this assignment was coded and tested server nunki.usc.edu .
+
+				    CODE FILES
+				------------------
+The following are the codefiles used in the project:
+
+1. server.c :Creates 'MAX_SERVER' Server processes using fork() which read the
+		server configuration file and send the information to client using
+		TCP (using socket(),connet() and send() ) and later recieve full 
+		Network information via UDP datagrams the client (using socket(), 
+		bind() and recvfrom()). Kindly note, recvfrom() blocking call is
+		used to keep the process threads alive till they recieve client's
+		Datagram and process the information.
+
+2. server.h :Lists all the functions and data strucutes which were used in server.c
+		for acheiving the objective.
+
+3. client.c :Creates a client TCP server (using socket(), bind(), listen()) and
+		which keeps listening for the incoming TCP segment from servers 
+		using accept() blocking call. Once a TCP segment is recieved by the
+		client it process it using posix thread (pthreads) and updates the 
+		server adjaceny matrix with protected write control on the data using
+		mutexes to avoid memory corruption. Then it generates a comprehensive 
+		map of the network and sends the same to the UDP Server Process on the
+		port number specified in the project. It also generates the MST from
+		the information gathered earlier using generate_MST() function which
+		implements Prim's Algorithm and prints the same on the console.
+
+4. client.h :Lists all the functions & data strucutres which were used in client.c 
+		for acheiving the objective.
+
+5. Makefile :compiles the code and genrates the executables 'server' and 'client'
+		to realize the servers and client functionality needed in assignment
+		After running make we can directly run the executables
+
+6. kill.sh  :A very simple shell script to kill any reduntant zombie processes, advi-
+		to run before running the server and client processes. Uses 'ps -aux|
+		grep $USERNAME' to find all the processes with name 'client' & 'server'
+		for the user USERNAME and terminates NOT KILLs them gracefully.
+
+					 USAGE
+				    ---------------
+1.  Compile the code by using 'make' command on the terminal after extracting
+	the files in a directory. A successful compilation is as below:
+		[nchaudha@nunki.usc.edu ~/lab3]> make
+		gcc -o server server.c -lnsl -lsocket -lresolv -lpthread
+		gcc -o client client.c -lnsl -lsocket -lresolv -lpthread
+		[nchaudha@nunki.usc.edu ~/lab3]>
+
+2.  To kill any zombie process which may be present earlier run the script kill.sh
+		The below is example on how to run the script
+		[nchaudha@nunki.usc.edu ~/lab3]>kill.sh
+
+3.  Start the client process in the terminal by running 'client' executable in the
+	same directory where compilation was done in step 1. The client should bootup
+	and display the intended messages.
+		The below is example on how to run client executable
+		[nchaudha@nunki.usc.edu ~/lab3]> client
+				OR
+		[nchaudha@nunki.usc.edu ~/lab3]> client&
+
+4.  Start the server process in another terminal by running 'server' executable in
+	the same directory where the compilation was done in step 1. The servers should
+	bootup and display the intended messages.
+		The below is example on how to run server executable
+		[nchaudha@nunki.usc.edu ~/lab3]> server
+				OR
+		[nchaudha@nunki.usc.edu ~/lab3]> server&
+
+				     IDIOSYNCRASY
+				 -------------------
+The client/server set up may fail to bootup if they fail to bind the intented port
+numbers which they need to run. Kinldy check if the port numbers 21545, 22525, 23525,
+24525, 25525 are not taken. The code while being tested used the below version of the
+server configuration file, an example file for serverA with name serverA.txt will have
+the connected servers list in the form of server name and cost tuples as shown below:
+serverB 20
+serverC 10
+
+Kindly make sure that the tuples start from the first line of the file as above.
+
+				      REFERENCES
+				 -------------------
+1. The Open Group Base Specifications Issue 6 IEEE Std 1003.1, 2004 Edition
+[http://pubs.opengroup.org/onlinepubs/9699919799/nfindex.html]
+2. The GNU C Library [http://www.gnu.org/software/libc/manual/html_mono/libc.html]
+3. C++ Refrences [http://www.cplusplus.com/reference/]
+4. Beej's Guide to Network Programming [http://www.beej.us/guide/bgnet/]
+5. POSIX Threads Programming [https://computing.llnl.gov/tutorials/pthreads/]

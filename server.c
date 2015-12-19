@@ -403,7 +403,7 @@ static void initiate_server_processes(unsigned int server_id, const char *str){
 	 * tuples, it fills up server_descriptor array 
 	 */
 	int i;
-	if (readServerConfigFile(servers[server_id])){
+	if (readServerConfigFile(&servers[server_id])){
 		perror("Server Configuration Read Fail\n");
 		exit(1);
 	}
@@ -411,17 +411,17 @@ static void initiate_server_processes(unsigned int server_id, const char *str){
 	printf("%s Matrix\nNeighbor\tCost\n",
 			map_serverid_to_name(server_id));
 
-	for (i = 0; i < servers[server_id]->link_count; i++){
+	for (i = 0; i < servers[server_id].link_count; i++){
 		printf("%d\t\t%d\n",
-			servers[server_id]->links[i].server_id,
-			servers[server_id]->links[i].linkcost);
+			servers[server_id].links[i].server_id,
+			servers[server_id].links[i].linkcost);
 	}
 #endif
 	/*get the TCP Message from the client*/
-	send_message_TCP(servers[server_id]);
+	send_message_TCP(&servers[server_id]);
 
 	/*get the UDP Message from the client*/
-	create_UDP_server(servers[server_id]);
+	create_UDP_server(&servers[server_id]);
 	
 }
 
@@ -444,11 +444,11 @@ int main( int argc, char *argv[])
 		pid = fork();
 		if(pid < 0) {
 			printf("Forking for %s Process failed\n",
-				map_serverid_to_name(servers[i]->server_id));
+				map_serverid_to_name(servers[i].server_id));
 			exit(1);
 		} else if (pid == 0) {
 			pr_debug("Forking for %s Process success\n",
-				map_serverid_to_name(servers[i]->server_id));
+				map_serverid_to_name(servers[i].server_id));
 			initiate_server_processes(i, SERVER_NAME);
 			exit(0);
 		} else {

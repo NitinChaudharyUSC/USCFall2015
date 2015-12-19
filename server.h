@@ -50,7 +50,7 @@ struct server_descriptor {
 	unsigned int link_count;
 };
 
-static struct server_descriptor servers[][MAX_SERVER] = {
+static struct server_descriptor servers[MAX_SERVER] = {
 	{serverA, server_config_files[serverA],{{0,0}}, 0},
 	{serverB, server_config_files[serverB],{{0,0}}, 0},
 	{serverC, server_config_files[serverC],{{0,0}}, 0},
